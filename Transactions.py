@@ -19,6 +19,9 @@ db['IndexT'] = 0
 db['DataT'] = []
 db['DateT'] = []
 
+def TotalTransactions():
+  return db['IndexT']
+
 class Transaction:
     def __init__(self,sender,receiver,amount):
       amount = float(amount)
@@ -33,17 +36,20 @@ class Transaction:
           self.receiver = receiver
           self.amount = amount
       self.data = str(self.sender) + " -> " +str(self.amount) + " -> " + str(self.receiver) 
-      self.date = datetime.now()
+      self.date = str(datetime.now())
 
     def Store(self):
       #Storing the Data, objects can't be stored
       db['Sender'].append(self.sender)
-      db['Receiver'].append(self.reveiver)
+      db['Receiver'].append(self.receiver)
       db['Amount'].append(self.amount)
       db['DataT'].append(self.data)
       db['DateT'].append(self.date)
 
       db['IndexT'] = db['IndexT'] + 1
+
+      #temp = str(db['IndexT']-1) + " " + 
+      return db['IndexT']-1
     
     def Update(self,ID):
       db['Sender'][ID] = self.sender

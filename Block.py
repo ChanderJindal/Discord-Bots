@@ -16,7 +16,7 @@ Check Block
 
 from replit import db # data base
 
-db['PreviousHash'] = []
+db['PreviousHash'] = ["!"]
 db['TID'] = []
 db['DateB'] = []
 db['Hash'] = []
@@ -30,7 +30,7 @@ class Block:
     def __init__(self,prev,tid) -> None:
         self.prev = prev 
         self.transaction = tid
-        self.date = datetime.now()
+        self.date = str(datetime.now())
         self.nonse = 0
         self.hash = hashlib.sha256(str(self).encode()).hexdigest()
 
@@ -38,7 +38,7 @@ class Block:
     def Store(self):
       #Storing the data
       db['PreviousHash'].append(self.prev)
-      db['TID'].append(self.tid)
+      db['TID'].append(self.transaction)
       db['DateB'].append(self.date)
       db['Hash'].append(self.hash)
       db['Nonse'].append(self.nonse)
@@ -58,7 +58,7 @@ class Block:
 
 
     def __str__(self):
-      return str(db['IndexB']) + str(self.tid)  + str(self.prev) + str(self.date) + str(self.nonse)
+      return "#" + str(db['IndexB']) +" with ID " + str(self.transaction)  + " and Code " + str(self.prev) + " is made on " + str(self.date) + " with special value of " + str(self.nonse)
     
 
     def printer(self):
@@ -70,14 +70,29 @@ class Block:
 def GetBlock(ID):
   ID = int(ID)
   MyBlock = Block("!",0)
-  if ID < db['IndexB']:#Block ID too large
+  if ID < db['IndexB'] or ID == 0:
+    #Block ID too large
     MyBlock.prev = db['PreviousHash'][ID]
     MyBlock.tid = db['TID'][ID]
     MyBlock.date = db['DateB'] [ID]
     MyBlock.hash = db['Hash'][ID]
     MyBlock.nonse = db['Nonse'][ID]
+  return MyBlock
 
+def GetPrevHash(ID):
+  if ID == 0:
+    return "!"
+  if ID > 0:
+    return db['PreviousHash'][ID]
+  return -1
 
+def PoolSize():
+  return db['IndexB'] - db['IndexChain']
+
+def GetCurrHash(ID):
+  if ID > -1 and ID < db['IndexB']:
+    return db['Hash'][ID]
+  return -1
 
 
 def MineBlock(difficulty,ID):
@@ -91,12 +106,12 @@ def MineBlock(difficulty,ID):
 
   #Mining the Block
   MyBlock = GetBlock(ID)
-  MyBlock.hash.update(str(MyBlock).encode('utf-8'))
-  MyBlock.hash = hashlib.sha256(str(MyBlock).encode() ).hexdigest()
-  while int(MyBlock.hash.encode().hexdigest(), 16) > 2**(256-difficulty):#may need to add a limit here, if takes too long
-    MyBlock.nonse += 1
-    MyBlock.hash = hashlib.sha256()
-    MyBlock.hash.update(str(MyBlock).encode('utf-8'))
+  Prefix = "0"*difficulty
+  while str(MyBlock.hash)[:difficulty] != Prefix:
+    #may need to add a limit here, if takes too long
+    MyBlock.nonse = MyBlock.nonse + 1
+    MyBlock.hash = hashlib.sha256(str(MyBlock).encode() ).hexdigest()
+    
   #either got it, or it failed
   db['Nonse'][ID] = MyBlock.nonse
   db['Hash'][ID] = MyBlock.hash
@@ -122,7 +137,8 @@ def CheckBlock(ID,difficulty):
   if MyBlock.hash != hashlib.sha256(str(MyBlock).encode()).hexdigest(): #current Hash Check
     return False
 
-  if int(MyBlock.hash.encode().hexdigest(), 16) > 2**(256-difficulty): #First difficulty numbers are Zero
+  if str(MyBlock.hash).startswith("0"*difficulty):
+     #First difficulty numbers are Zero
     return True
   return False
 
