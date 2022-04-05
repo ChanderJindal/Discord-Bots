@@ -1,0 +1,1 @@
+This is the Code corresponding to the once used Block Chain Bot I made for a class Industrial Training.
