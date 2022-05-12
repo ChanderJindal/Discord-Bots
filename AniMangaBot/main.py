@@ -121,6 +121,6 @@ async def chkauth(ctx, channel: discord.TextChannel, msgID: int):
 
 import os
 
-tk = 'OTM4NDg3NDExODE2NjkzODQz.YfrAgw.Jic9wLLoiyzP1cQy0yBgKPPyZcI'#os.environ['TOKEN']
+tk = os.environ['TOKEN']
 
 bot.run(tk)
